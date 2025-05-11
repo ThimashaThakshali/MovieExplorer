@@ -2,6 +2,7 @@
   "name": "movie-explorer",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://ThimashaThakshali.github.io/MovieExplorer",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
@@ -15,12 +16,17 @@
     "react-scripts": "5.0.1",
     "web-vitals": "^5.0.0"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
+
+
+"scripts": {
+  "start": "react-scripts start",
+  "build": "react-scripts build",
+  "test": "react-scripts test",
+  "eject": "react-scripts eject",
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d build"
+},
+
   "eslintConfig": {
     "extends": [
       "react-app",
