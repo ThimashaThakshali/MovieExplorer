@@ -1,9 +1,20 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import { AppBar, Toolbar, Typography, Button } from "@mui/material";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  IconButton,
+  Switch,
+  FormControlLabel,
+  Box,
+} from "@mui/material";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
 
-const NavBar = () => {
+const NavBar = ({ darkMode, toggleDarkMode }) => {
   const { user, logout } = useContext(AuthContext);
 
   return (
@@ -30,6 +41,11 @@ const NavBar = () => {
             Login
           </Button>
         )}
+        <Box sx={{ display: "flex", alignItems: "center", ml: 2 }}>
+          <IconButton onClick={toggleDarkMode} color="inherit">
+            {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+          </IconButton>
+        </Box>
       </Toolbar>
     </AppBar>
   );

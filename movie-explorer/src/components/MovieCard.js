@@ -27,10 +27,26 @@ const MovieCard = ({ movie }) => {
   };
 
   return (
-    <Card sx={{ maxWidth: 200, m: 2, position: "relative" }}>
+    <Card
+      sx={{
+        width: 200,
+        height: "100%",
+        m: 2,
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        borderRadius: 4,
+      }}
+    >
       <Link
         to={`/movie/${movie.id}`}
-        style={{ textDecoration: "none", color: "inherit" }}
+        style={{
+          textDecoration: "none",
+          color: "inherit",
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+        }}
       >
         {movie.poster_path ? (
           <CardMedia
@@ -38,6 +54,7 @@ const MovieCard = ({ movie }) => {
             height="300"
             image={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
             alt={movie.title}
+            sx={{ objectFit: "cover" }}
           />
         ) : (
           <Box
@@ -45,20 +62,47 @@ const MovieCard = ({ movie }) => {
             display="flex"
             alignItems="center"
             justifyContent="center"
-            bgcolor="#ddd"
+            bgcolor="rgba(0,0,0,0.1)"
+            sx={{
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
           >
-            <Typography>No Image</Typography>
+            <Typography variant="body2">No Image Available</Typography>
           </Box>
         )}
-        <CardContent>
-          <Typography gutterBottom variant="h6" component="div">
+        <CardContent sx={{ flexGrow: 1, pb: 0 }}>
+          <Typography
+            gutterBottom
+            variant="h6"
+            component="div"
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              lineHeight: 1.2,
+              height: "2.4em",
+              mb: 1,
+            }}
+          >
             {movie.title}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ paddingTop: 1, paddingBottom: 1 }}
+          >
             {movie.release_date?.slice(0, 4)}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            ⭐ {movie.vote_average}
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ paddingTop: 1, paddingBottom: 0 }}
+          >
+            ⭐ {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"}
           </Typography>
         </CardContent>
       </Link>
@@ -67,12 +111,18 @@ const MovieCard = ({ movie }) => {
           position: "absolute",
           top: 5,
           right: 5,
-          color: favorite ? "red" : "gray",
+          color: favorite ? "red" : "rgba(255,255,255,0.8)",
+          backgroundColor: "rgba(0,0,0,0.3)",
+          "&:hover": {
+            backgroundColor: "rgba(0,0,0,0.5)",
+          },
+          width: 36,
+          height: 36,
         }}
         onClick={handleFavoriteClick}
         aria-label="add to favorites"
       >
-        <FavoriteIcon />
+        <FavoriteIcon fontSize="small" />
       </IconButton>
     </Card>
   );

@@ -1,11 +1,6 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { AuthProvider } from "./context/AuthContext";
@@ -21,13 +16,76 @@ function App() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    // Get from localStorage, default to system preference
+    const savedMode = localStorage.getItem("darkMode");
+    if (savedMode !== null) {
+      return savedMode === "true";
+    } else {
+      return (
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+      );
+    }
+  });
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [filters, setFilters] = useState({
+    genre: "",
+    yearFrom: 1900,
+    yearTo: new Date().getFullYear(),
+    rating: 0,
+  });
+  const [unfilteredMovies, setUnfilteredMovies] = useState([]);
 
   const API_KEY = "c61cf8b548703717097672494bb13aec";
+
+  useEffect(() => {
+    // Save darkMode preference to localStorage
+    localStorage.setItem("darkMode", darkMode.toString());
+  }, [darkMode]);
+
+  // Apply filters client-side when filters change
+  useEffect(() => {
+    if (unfilteredMovies.length > 0) {
+      applyFilters();
+    }
+  }, [filters]);
 
   const theme = createTheme({
     palette: {
       mode: darkMode ? "dark" : "light",
+      primary: {
+        main: darkMode ? "#90caf9" : "#1976d2",
+      },
+      secondary: {
+        main: darkMode ? "#f48fb1" : "#dc004e",
+      },
+      background: {
+        default: darkMode ? "#121212" : "#f5f5f5",
+        paper: darkMode ? "#1e1e1e" : "#ffffff",
+      },
+    },
+    typography: {
+      fontFamily: "'Segoe UI', 'Roboto', 'Arial', sans-serif",
+      h4: {
+        fontWeight: 600,
+      },
+    },
+    components: {
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            transition: "transform 0.3s ease, box-shadow 0.3s ease",
+            "&:hover": {
+              transform: "translateY(-8px)",
+              boxShadow: darkMode
+                ? "0 8px 20px rgba(0,0,0,0.4)"
+                : "0 8px 20px rgba(0,0,0,0.2)",
+            },
+          },
+        },
+      },
     },
   });
 
@@ -40,26 +98,102 @@ function App() {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      searchMovies();
+    if (e.key === "Enter" && query.trim()) {
+      searchMovies(query, 1); // Reset to page 1 on new search
     }
   };
 
-  const searchMovies = async (queryToSearch = query) => {
+  // Apply filters to the current set of unfiltered movies
+  const applyFilters = () => {
+    const filteredResults = unfilteredMovies.filter((movie) => {
+      // Filter by genre
+      const matchesGenre = filters.genre
+        ? movie.genre_ids?.includes(Number(filters.genre))
+        : true;
+
+      // Filter by year
+      const releaseYear = movie.release_date?.split("-")[0];
+      const matchesYear =
+        releaseYear &&
+        Number(releaseYear) >= filters.yearFrom &&
+        Number(releaseYear) <= filters.yearTo;
+
+      // Filter by rating
+      const matchesRating = movie.vote_average >= filters.rating;
+
+      return matchesGenre && matchesYear && matchesRating;
+    });
+
+    if (filteredResults.length === 0 && unfilteredMovies.length > 0) {
+      setError(
+        "No movies match your filter criteria. Try adjusting your filters."
+      );
+    } else {
+      setError("");
+    }
+
+    setMovies(filteredResults);
+  };
+
+  const searchMovies = async (queryToSearch = query, pageNum = 1) => {
     if (!queryToSearch.trim()) return;
     setLoading(true);
     setError("");
 
     try {
-      const res = await axios.get(
-        `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(
-          queryToSearch
-        )}`
-      );
-      setMovies(res.data.results);
+      // Basic search URL without filters for client-side filtering
+      let url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(
+        queryToSearch
+      )}&page=${pageNum}`;
+
+      const res = await axios.get(url);
+
+      if (res.data.results.length === 0) {
+        setError("No movies found. Try a different search term.");
+      }
+
+      const newMovies =
+        pageNum === 1
+          ? res.data.results
+          : [...unfilteredMovies, ...res.data.results];
+
+      setUnfilteredMovies(newMovies);
+      setTotalPages(res.data.total_pages);
+      setPage(pageNum);
       localStorage.setItem("lastSearch", queryToSearch);
+
+      // Apply filters to the new results
+      const filteredResults = newMovies.filter((movie) => {
+        // Filter by genre
+        const matchesGenre = filters.genre
+          ? movie.genre_ids?.includes(Number(filters.genre))
+          : true;
+
+        // Filter by year
+        const releaseYear = movie.release_date?.split("-")[0];
+        const matchesYear =
+          releaseYear &&
+          Number(releaseYear) >= filters.yearFrom &&
+          Number(releaseYear) <= filters.yearTo;
+
+        // Filter by rating
+        const matchesRating = movie.vote_average >= filters.rating;
+
+        return matchesGenre && matchesYear && matchesRating;
+      });
+
+      if (filteredResults.length === 0 && newMovies.length > 0) {
+        setError(
+          "No movies match your filter criteria. Try adjusting your filters."
+        );
+      }
+
+      setMovies(filteredResults);
     } catch (err) {
-      setError("Failed to fetch movies.");
+      setError(
+        "Failed to fetch movies. Please check your connection and try again."
+      );
+      console.error("Search error:", err);
     } finally {
       setLoading(false);
     }
@@ -85,6 +219,13 @@ function App() {
                     loading={loading}
                     error={error}
                     movies={movies}
+                    unfilteredMovies={unfilteredMovies}
+                    searchMovies={searchMovies}
+                    page={page}
+                    totalPages={totalPages}
+                    filters={filters}
+                    setFilters={setFilters}
+                    applyFilters={applyFilters}
                   />
                 }
               />

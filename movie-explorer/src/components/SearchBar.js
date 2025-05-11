@@ -1,5 +1,6 @@
 import React from "react";
-import { TextField } from "@mui/material";
+import { TextField, InputAdornment } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
 const SearchBar = ({ query, onChange, onKeyPress }) => (
   <TextField
@@ -9,6 +10,13 @@ const SearchBar = ({ query, onChange, onKeyPress }) => (
     value={query}
     onChange={onChange}
     onKeyPress={onKeyPress}
+    InputProps={{
+      startAdornment: (
+        <InputAdornment position="start">
+          <SearchIcon />
+        </InputAdornment>
+      ),
+    }}
     sx={{
       mb: 4,
       "& .MuiOutlinedInput-root": {
