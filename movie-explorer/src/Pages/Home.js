@@ -1,4 +1,6 @@
 import React from "react";
+import SearchBar from "./components/SearchBar";
+import MovieList from "./components/MovieList";
 
 const Home = ({
   query,
@@ -11,15 +13,11 @@ const Home = ({
 }) => {
   return (
     <div>
-      <div className="search-bar">
-        <input
-          type="text"
-          placeholder="Search for a movie..."
-          value={query}
-          onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
-        />
-      </div>
+      <SearchBar
+        query={query}
+        onChange={handleInputChange}
+        onKeyPress={handleKeyPress}
+      />
 
       {loading && <p>Loading movies...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
@@ -27,25 +25,7 @@ const Home = ({
         <p>No movies found for "{query}".</p>
       )}
 
-      <div className="movie-list">
-        {movies.map((movie) => (
-          <div className="movie-card" key={movie.id}>
-            {movie.poster_path ? (
-              <img
-                src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                alt={movie.title}
-              />
-            ) : (
-              <div style={{ height: "300px", backgroundColor: "#ddd" }}>
-                No Image
-              </div>
-            )}
-            <h3>{movie.title}</h3>
-            <p>{movie.release_date?.split("-")[0]}</p>
-            <p>⭐ {movie.vote_average}</p>
-          </div>
-        ))}
-      </div>
+      <MovieList movies={movies} />
     </div>
   );
 };
