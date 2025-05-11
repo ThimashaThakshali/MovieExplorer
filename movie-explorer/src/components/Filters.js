@@ -60,8 +60,8 @@ const Filters = ({ filters, setFilters, searchMovies, query }) => {
 
   return (
     <Paper elevation={1} sx={{ p: 2, mb: 2, borderRadius: 2 }}>
-      <Grid container spacing={2} alignItems="flex-end">
-        <Grid item xs={12} sm={6} md={3}>
+      <Grid container spacing={10} alignItems="flex-end">
+        <Grid item xs={12} sm={6} md={3} sx={{ display: "flex", gap: 1 }}>
           <FormControl fullWidth>
             <InputLabel>Genre</InputLabel>
             <Select
@@ -120,7 +120,7 @@ const Filters = ({ filters, setFilters, searchMovies, query }) => {
           </Box>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3} sx={{ display: "flex", gap: 1 }}>
+        <Grid item xs={12} sm={6} md={3} sx={{ display: "flex", gap: 5 }}>
           <Button
             variant="contained"
             startIcon={<FilterAltIcon />}
