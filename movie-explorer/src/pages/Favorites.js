@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { FavoritesContext } from "../context/FavoritesContext";
 import MovieList from "../Components/MovieList";
-import SearchBar from "../components/SearchBar";
+import SearchBar from "../Components/SearchBar";
 import { Container, Typography } from "@mui/material";
 
 const Favorites = () => {
