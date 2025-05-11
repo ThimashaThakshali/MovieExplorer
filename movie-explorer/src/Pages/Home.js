@@ -1,7 +1,7 @@
 // src/pages/Home.jsx
 import React, { useEffect, useState } from "react";
-import SearchBar from "../bg/SearchBar";
-import MovieCard from "../bg/MovieCard";
+import SearchBar from "../components/SearchBar";
+import MovieCard from "../components/MovieCard";
 import { Grid, Typography, CircularProgress, Container } from "@mui/material";
 import axios from "axios";
 
