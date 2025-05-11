@@ -63,6 +63,15 @@ const Home = ({
           <MovieCard key={movie.id} movie={movie} />
         ))}
       </Grid>
+      {movies.length > 0 && page < totalPages && (
+        <Button
+          variant="contained"
+          onClick={() => searchMovies(query, page + 1)}
+          sx={{ mt: 2 }}
+        >
+          Load More
+        </Button>
+      )}
     </Container>
   );
 };
