@@ -1,13 +1,15 @@
 import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
+import Home from "./pages/Home";
 
 function App() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(false); // NEW
-  const [error, setError] = useState(null); // NEW
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const API_KEY = "c61cf8b548703717097672494bb13aec"; // Replace with your TMDb API key
+  const API_KEY = "c61cf8b548703717097672494bb13aec";
 
   const handleInputChange = (e) => {
     setQuery(e.target.value);
@@ -15,9 +17,9 @@ function App() {
 
   const searchMovies = async () => {
     if (!query) return;
-    setLoading(true); // Start loading
-    setError(null); // Clear errors
-    setMovies([]); // Clear old movies
+    setLoading(true);
+    setError(null);
+    setMovies([]);
 
     try {
       const response = await fetch(
@@ -33,7 +35,7 @@ function App() {
     } catch (err) {
       setError("Something went wrong while fetching movies. 😢");
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
@@ -44,48 +46,29 @@ function App() {
   };
 
   return (
-    <div className="app">
-      <h1>Movie Explorer 🎬</h1>
+    <Router>
+      <div className="app">
+        <h1>Movie Explorer 🎬</h1>
 
-      <div className="search-bar">
-        <input
-          type="text"
-          placeholder="Search for a movie..."
-          value={query}
-          onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
-        />
-      </div>
-
-      {/* Loading message */}
-      {loading && <p>Loading movies...</p>}
-
-      {/* Error message */}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {/* No results message */}
-      {!loading && movies.length === 0 && query && !error && (
-        <p>No movies found for "{query}".</p>
-      )}
-
-      <div className="movie-list">
-        {movies.map((movie) => (
-          <div className="movie-card" key={movie.id}>
-            {movie.poster_path ? (
-              <img
-                src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                alt={movie.title}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Home
+                query={query}
+                setQuery={setQuery}
+                handleInputChange={handleInputChange}
+                handleKeyPress={handleKeyPress}
+                loading={loading}
+                error={error}
+                movies={movies}
               />
-            ) : (
-              <div style={{ height: "300px", backgroundColor: "#ddd" }}>
-                No Image
-              </div>
-            )}
-            <h3>{movie.title}</h3>
-          </div>
-        ))}
+            }
+          />
+          {/* More routes coming soon */}
+        </Routes>
       </div>
-    </div>
+    </Router>
   );
 }
 
